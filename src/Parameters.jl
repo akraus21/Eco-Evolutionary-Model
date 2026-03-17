@@ -10,11 +10,11 @@ function logistic_schedule(t)
 end
 
 """
-Function that calculates a Mutation Kernel once (!), returning a nbins x nbins matrix 
+Function that calculates a Mutation Kernel once, returning a nbins x nbins matrix 
 where entries contain the probability to jump from bin_i to bin_j. 
 """
 
-function mutation_kernel_discrete(bins; μ=0.0, σ=0.1)
+function mutation_kernel_discrete(bins; μ=0.0, σ=0.15)
     nb = length(bins)
     log_bins = log10.(bins)
     K = zeros(Float64, nb, nb)
@@ -29,6 +29,11 @@ function mutation_kernel_discrete(bins; μ=0.0, σ=0.1)
 end
 
 mutable struct Params
+    """
+    Defines the parameters constructor. 
+    Contains all relevant parameters used in the simulation. 
+    """
+    
     # model structure
     no_species::Int 
     no_wells::Int 
@@ -87,6 +92,12 @@ function const_params(;
     dilution_factor = 1 / 300,
     sim_days = 15
 )
+    """
+    Constructs a Params constructor from the input parameters.
+    Additionally calculates the growth rates, timesteps, bottleneck interval and the mutation kernel. 
+    Should be used to generate the Params constructor. 
+    const_params() returns the default values. 
+    """
     bins = 10 .^ range(log10(R50_min), log10(R50_max), length=nbins)
     µ = log(2) ./ µ_dt
     timesteps = round(Int, sim_days * 1440 / Δt_phys - 1)
@@ -106,8 +117,16 @@ function const_params(;
     )
 end
 
-focal_init_R50 = 88
-co_strain_init_R50 = 200
+# --- Default initial counts --- 
+"""
+The default initial counts for three conditions: 
+    - monoculture 
+    - co-culture in a single well 
+    - co-culture in a metapopulation with 96 wells
+"""
+
+focal_init_R50 = 88 # Set initial R_50 of focal strain to ~7.5
+co_strain_init_R50 = 200 # Set the initial R_50 of co-strain to max value 
 
 # Initialize population: counts[bin, species]
 mono_counts0 = zeros(Int, const_params().nbins, 1, 1)
