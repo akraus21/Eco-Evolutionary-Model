@@ -1,24 +1,46 @@
-# --- Recorder and Metrics 
+# --- Recorder and Metrics ---
+"""
+Defines the recorder functions and the metric structs that can be recorded. 
+Each metric consists of four parts: 
+    - The mutable constructor defining the objects where the recorded data is stored
+    - A function returning the default state of the constructor 
+    - A reset!() function resetting the constructor to its default state 
+    - A record!() function recording the metrics of interest and storing them. 
+The metrics must be passed as an array, containing each metric one wants to record as a tuple.
+The tuple contains the metric constructor and the time interval at which the metric should be recorded. 
+"""
 
 function collect_metrics(metrics)
+    """
+    Creates a tuple out of the metrics given in an array, which makes it easier to reset them. 
+    """
     NamedTuple{Tuple(Symbol(nameof(typeof(m.metric))) for m in metrics)}(
         Tuple(m.metric for m in metrics)
     )
 end
 
 function init_metrics!(metrics)
+    """
+    Loop over all metrics and initialise each using their respective reset!() function 
+    """
     for m in eachindex(metrics)
         reset!(metrics[m])
     end
 end
 
 function record!(m::Every, state, t, p)
+    """
+    Record each metric using the respective record!() function and defined time interval. 
+    """
     if t % m.Δt ≈ 0 
         record!(m.metric, state, p)
     end
 end
 
 # --- Population Size Metric ---
+"""
+A metric that records the population size of the focal strain and the time. 
+"""
 
 mutable struct PopSizeMetric <: Metric
     pop1::Vector{Int}
