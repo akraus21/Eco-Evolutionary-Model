@@ -2,21 +2,20 @@ using Random, Distributions, LinearAlgebra
 
 # --- Simulation Functions --- 
 
-"""
-Logistic function used for the drug schedule. 
-"""
 function logistic(x, cc_max, x_0, k)
+    """
+    Logistic function used for the drug schedule. 
+    """
     cc_max / (1 + k^(x/24.0 - x_0))
 end
 
-"""
-Function that applies the previously computed mutation kernel to a Vector of Counts
-and mutates and distributes them to another array. 
-"""
-
 function mutate_newborns!(counts, p, d_eff::Vector{Float64}, b_eff::Float64)
+    """
+    Applies the precomputed mutation kernel to a Vector (!) of Counts
+    and mutates and distributes them to another array. 
+    """
     
-    new_counts = zeros(Int, p.nbins)
+    new_counts = zeros(Int, p.nbins) 
 
     for i in 1:p.nbins
         n = counts[i]
