@@ -4,15 +4,37 @@ using Random, Distributions, LinearAlgebra
 
 function logistic(x, cc_max, x_0, k)
     """
-    Logistic function used for the drug schedule. 
+    Logistic function used for the drug schedule.
+
+    Parameters:
+    - x       : time (hours)
+    - cc_max  : maximum concentration
+    - x_0     : midpoint (inflection point)
+    - k       : steepness/base of exponential
+
+    Returns:
+    - Drug concentration at time x
     """
     cc_max / (1 + k^(x/24.0 - x_0))
 end
 
 function mutate_newborns!(counts, p, d_eff::Vector{Float64}, b_eff::Float64)
     """
-    Applies the precomputed mutation kernel to a Vector (!) of Counts
-    and mutates and distributes them to another array. 
+    Applies mutation process to a vector (!) of newborn counts.
+
+    Process:
+    1. Determine how many mutate
+    2. Apply survival probability to mutants
+    3. Redistribute surviving mutants across bins via mutation kernel
+
+    Parameters:
+    - counts : Vector of newborn counts per bin (modified conceptually, not in-place)
+    - p      : parameter struct (contains mutation_rate, nbins, K_mut, etc.)
+    - d_eff  : effective death rates per bin
+    - b_eff  : effective birth rate
+
+    Returns:
+    - new_counts : updated counts after mutation
     """
     
     new_counts = zeros(Int, p.nbins) 
@@ -20,24 +42,28 @@ function mutate_newborns!(counts, p, d_eff::Vector{Float64}, b_eff::Float64)
     for i in 1:p.nbins
         n = counts[i]
         if n == 0
-            continue
+            continue # skip empty bins for efficiency
         end
 
-        # how many mutate?
+        # --- Mutation step ---
+        # Number of individuals that mutate
         n_mut = rand(Binomial(n, p.mutation_rate))
 
         # effective rates for this bin
 
+        # --- Survival of mutants ---
+        # Estimate probability mutant survives (fitness-based)
         p_est = clamp(1 - d_eff[i] / b_eff, 0.0, 1.0)
 
         n_est = rand(Binomial(n_mut, p_est))
 
-        # survivors
+        # --- Non-mutated survivors remain in same bin ---
         n_surv = n - n_mut
         new_counts[i] += n_surv
 
-        # distribute mutants
+        # --- Redistribute surviving mutants ---
         if n_est > 0
+            # Multinomial redistribution using mutation kernel
             m = rand(Multinomial(n_est, view(p.K_mut, i, :)))
             new_counts .+= m
         end
@@ -47,6 +73,13 @@ function mutate_newborns!(counts, p, d_eff::Vector{Float64}, b_eff::Float64)
 end
 
 function dilute!(::NoPooling, counts, p)
+    """
+    Dilution without pooling:
+    Each well is diluted independently.
+
+    For each bin and species:
+    - Apply Binomial thinning with dilution_factor
+    """
     for i in 1:p.nbins
         for s in 1:p.no_species
             n = counts[i, s, 1]
@@ -58,8 +91,15 @@ function dilute!(::NoPooling, counts, p)
 end
 
 function dilute!(::Pooling, counts, p)
-    # Initialise an array to store the pooled counts
-    pooled_counts = zeros(p.nbins, p.no_species) ### Replace with preallocated array!
+    """
+    Dilution with pooling:
+    1. Pool all wells for each species
+    2. Apply dilution
+    3. Redistribute across wells uniformly
+    """
+    
+    # Temporary storage for pooled counts
+    pooled_counts = zeros(p.nbins, p.no_species) 
 
     # Treat each species seperately 
     for s in 1:p.no_species
@@ -72,11 +112,12 @@ function dilute!(::Pooling, counts, p)
 
             n = pooled_counts[i,s]
 
-            # dilution first
+            # --- Apply dilution ---
             n_surv = rand(Binomial(n, p.dilution_factor))
 
-            # redistribute across wells
+            # --- Redistribute survivors ---
             if n_surv > 0
+                # Uniform redistribution across wells
                 m = rand(Multinomial(n_surv, fill(1/p.no_wells, p.no_wells)))
                 counts[i,s,:] .= m
             else
@@ -86,35 +127,53 @@ function dilute!(::Pooling, counts, p)
     end
 end
 
-"""
-Logistic function takes in an IC50 value and a drug concentration C and returns a death rate. 
-    Maximum of the rate is dmax and steepness is h. 
-"""
 function drug_death(ic50::Float64, C::Float64; dmax::Float64=0.02, h::Float64=2.0)
+    """
+    Drug-induced death rate using Hill function.
+
+    Parameters:
+    - ic50 : concentration where effect is half-maximal
+    - C    : current drug concentration
+    - dmax : maximum death rate
+    - h    : Hill coefficient (steepness)
+
+    Returns:
+    - death probability contribution
+    """
     return dmax * (C^h / (C^h + ic50^h))
 end
 
-"""
-Function quantifying the effect of crowding on growth. 
-The function is a Hill-type function, steepness is given by h. 
-N: the whole population size of a species
-K: carrying capacity in absolute numbers. 
-Returns a number between 0.0 and 1.0.  
-"""
 function crowd_growth(N; K = 1e8, h = 2.0)
+    """
+    Density-dependent growth suppression (Hill-type).
+
+    Parameters:
+    - N : population size
+    - K : carrying capacity
+    - h : steepness
+
+    Returns:
+    - scaling factor ∈ (0,1]
+    """
     return 1/(1 + (N / K)^h)
 end
 
 function is_bottleneck(t, p)
+    """
+    Checks if current timestep is a bottleneck event.
+    """
     return t % p.bottleneck_interval == 0 
 end
 
 growth_interaction(::NoInteraction, N_i, N_other, p) = 1.0 
 
 growth_interaction(::Interaction, N_i, N_other, p) = 
+    # Interaction function returning the interaction factor ∈ [α_int,1]
+    # eps() prevents division by zero
     (N_i + p.α_int * (N_other * p.K_int)) / (N_i + (N_other * p.K_int) + eps())
 
 growth_rate(i, s, w, counts, config, p) =
+    # Growth scaled by crowding
     p.µ[s] * p.Δt * config.crowding_fn(sum(counts[:, s, w]); K = p.K) 
 
 death_rate(d_drug, d0, Δt) = 
@@ -124,6 +183,10 @@ death_rate(d_drug, d0, Δt) =
 other_population(::NoInteraction, state, s, w) = 0
 
 function other_population(::Interaction, state, s, w)
+    """
+    Returns population of competing species in same well.
+    Assumes 2-species system (index trick: 3 - s).
+    """
     j = 3 - s
     return sum(state.counts[:, j, w])
 end
@@ -132,11 +195,12 @@ end
 
 function step_well!(state, w, t, config, p, newborn_counts, N_other)
 
-    # Array containing the drug death rate for each IC50 value
+    # Array containing the drug death rate for each R_50 value
     d_drug = drug_death.(p.bins, state.drug_conc)
 
     for s in 1:p.no_species
 
+        # Get competing population
         N_other = other_population(config.interaction, state, s, w)
 
         # 1. Death and Birth 
@@ -168,7 +232,7 @@ function step_well!(state, w, t, config, p, newborn_counts, N_other)
         # Add mutated newborns to counts (survivors already included)
         state.counts[:, s, w] .+= mutated_newborns
 
-        # Re-initialize newborns and deaths 
+        # Re-initialize newborns  
         fill!(newborn_counts, 0)
     end
 end
