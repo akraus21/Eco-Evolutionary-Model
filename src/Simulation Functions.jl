@@ -18,7 +18,7 @@ function logistic(x, cc_max, x_0, k)
     cc_max / (1 + k^(x/24.0 - x_0))
 end
 
-function mutate_newborns!(counts, p, d_eff::Vector{Float64}, b_eff::Float64)
+function mutate_newborns(counts, p, d_eff::Vector{Float64}, b_eff::Float64)
     """
     Applies mutation process to a vector (!) of newborn counts.
 
