@@ -1,4 +1,11 @@
 # --- Metric Functions --- 
+"""
+Functions, which can be used to record various metrics, such as: 
+    the mean IC_50 of the focal population 
+    the shannon entropy 
+    the number of establishments or 
+    the number of extinctions
+"""
 
 function geometric_mean_ic50(bins, counts)
     s = 0.0
