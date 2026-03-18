@@ -103,44 +103,44 @@ $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
 ## Example use
 
-> _Activate the environment_
-> using Pkg
-> Pkg.activate("../..")
-> Pkg.instantiate()
->
-> _Include all dependencies_
-> include("Main Simulation.jl")
+_Activate the environment_
+    using Pkg
+    Pkg.activate("../..")
+    Pkg.instantiate()
+
+_Include all dependencies_
+    include("Main Simulation.jl")
 
 _Define the model configuration_
-co_config = ModelConfig(
-    growth_fn = growth_rate,
-    death_fn = death_rate,
-    interaction = NoInteraction(),
-    interaction_fn = growth_interaction,
-    dilution = NoPooling(),
-    mutation_fn = mutate_newborns,
-    crowding_fn = crowd_growth,
-    drug_schedule = logistic_schedule,
-    record_fn = record!,
-    metrics = [Every(PopSizeMetric(), 1.0)], 
-    params = const_params(K = 1e7)
-)
+    co_config = ModelConfig(
+        growth_fn = growth_rate,
+        death_fn = death_rate,
+        interaction = NoInteraction(),
+        interaction_fn = growth_interaction,
+        dilution = NoPooling(),
+        mutation_fn = mutate_newborns,
+        crowding_fn = crowd_growth,
+        drug_schedule = logistic_schedule,
+        record_fn = record!,
+        metrics = [Every(PopSizeMetric(), 1.0)], 
+        params = const_params(K = 1e7)
+    )
 
 _Run the simulation_
-results = run_simulation(co_counts0, co_config)
+    results = run_simulation(co_counts0, co_config)
 
 The results can afterwards be plotted 
 
-using CairoMakie
-
-fig = Figure() 
-ax = Axis(fig[1, 1],
-title = "Focal Strain Population Size over Time", 
-xlabel = "Time [hours]",
-ylabel = "Population Size",
-)
-
-CairoMakie.lines!(ax, results.PopSizeMetric.time, results.PopSizeMetric.pop1)
+    using CairoMakie
+    
+    fig = Figure() 
+    ax = Axis(fig[1, 1],
+    title = "Focal Strain Population Size over Time", 
+    xlabel = "Time [hours]",
+    ylabel = "Population Size",
+    )
+    
+    CairoMakie.lines!(ax, results.PopSizeMetric.time, results.PopSizeMetric.pop1)
 
 <img width="1200" height="900" alt="Example Plot" src="https://github.com/user-attachments/assets/0c676928-5013-43dc-ac35-a90d374aa79d" />
 
