@@ -72,7 +72,7 @@ Crowding limits growth via: $b^{\mathrm{crowd}}_i(t) = \frac{K^{h_b}}{K^{h_b} + 
 ---
 
 ### 4. Dilution
-Every 24 hours, the population is diluted via binomial sampling with rate $\(\delta\)$.
+Every 24 hours, the population is diluted via binomial sampling with rate $\delta$.
 
 ---
 
@@ -87,15 +87,15 @@ Ignoring mutation and dilution, the expected update for each bin is: $N_{i,k}(t+
 After mutation, cells face stochastic extinction governed by: $p^{\mathrm{surv}}_{i,j} =1 - \frac{d^{\mathrm{eff}}_j}{b^{\mathrm{eff}}_i}$
 
 with:
-- $\(d^{\mathrm{eff}}_j = d^{\mathrm{base}} + d^{\mathrm{drug}}_j\)$
-- $\(b^{\mathrm{eff}}_i = b_i^{\mathrm{base}}\)$
+- $d^{\mathrm{eff}}_j = d^{\mathrm{base}} + d^{\mathrm{drug}}_j$
+- $b^{\mathrm{eff}}_i = b_i^{\mathrm{base}}$
 
 This creates an **effective resistance threshold**:
 - Below threshold → extinction is certain  
 - Above threshold → survival probability > 0  
 
 For typical parameters:
-- Threshold ≈ 2× increase in $\(R_{50}\)$  
+- Threshold ≈ 2× increase in $R_{50}$  
 - Maximum survival probability:
 $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
