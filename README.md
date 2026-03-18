@@ -99,4 +99,53 @@ For typical parameters:
 - Maximum survival probability:
 $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
+## Example use
 
+_Activate the environment_
+using Pkg
+Pkg.activate("../..")
+Pkg.instantiate()
+
+_Include all dependencies_
+include("Main Simulation.jl")
+
+_Define the model configuration_
+co_config = ModelConfig(
+    growth_fn = growth_rate,
+    death_fn = death_rate,
+    interaction = NoInteraction(),
+    interaction_fn = growth_interaction,
+    dilution = NoPooling(),
+    mutation_fn = mutate_newborns,
+    crowding_fn = crowd_growth,
+    drug_schedule = logistic_schedule,
+    record_fn = record!,
+    metrics = [Every(PopSizeMetric(), 1.0)], 
+    params = const_params(K = 1e7)
+)
+
+_Run the simulation_
+results = run_simulation(co_counts0, co_config)
+
+The results can afterwards be plotted 
+
+using CairoMakie
+
+fig = Figure()
+ax = Axis(fig[1, 1])
+
+CairoMakie.lines!(ax, results.PopSizeMetric.time, results.PopSizeMetric.pop1)
+
+<img width="1200" height="900" alt="Example Plot" src="https://github.com/user-attachments/assets/1c4c0b5b-00bf-4f34-9fe7-aecbc5c18050" />
+
+## Why this project? 
+
+The implementation makes use of Julias dispatch feature, allowing a modular architecture and making it easy to compare different function configuration. 
+
+In our case we modeled two different **interactions** between two strains:
+1. a demographic interaction, reducing the respective population size and therefore the mutant supply.
+2. an establishment interaction, suppressing the establishment of mutants.
+
+We compared the resulting survival time distributions of the focal strain with our experimental data and were able to show that a purely demographic interaction is not sufficient to explain our results.
+
+The modular architecture allows dynamic changes and extensions to this system, while retaining the core simulation logic.  
