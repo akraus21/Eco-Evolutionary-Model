@@ -105,7 +105,7 @@ $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
     # Activate the environment
     using Pkg
-    Pkg.activate("../..")
+    Pkg.activate()
     Pkg.instantiate()
 
     # Include all dependencies
