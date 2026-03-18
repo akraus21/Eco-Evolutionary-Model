@@ -99,6 +99,8 @@ For typical parameters:
 - Maximum survival probability:
 $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
+---
+
 ## Example use
 
 _Activate the environment_
@@ -131,7 +133,7 @@ The results can afterwards be plotted
 
 using CairoMakie
 
-fig = Figure()
+fig = Figure() 
 ax = Axis(fig[1, 1],
 title = "Focal Strain Population Size over Time", 
 xlabel = "Time [hours]",
@@ -142,6 +144,7 @@ CairoMakie.lines!(ax, results.PopSizeMetric.time, results.PopSizeMetric.pop1)
 
 <img width="1200" height="900" alt="Example Plot" src="https://github.com/user-attachments/assets/0c676928-5013-43dc-ac35-a90d374aa79d" />
 
+---
 
 ## Why this project? 
 
