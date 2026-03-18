@@ -132,7 +132,11 @@ The results can afterwards be plotted
 using CairoMakie
 
 fig = Figure()
-ax = Axis(fig[1, 1])
+ax = Axis(fig[1, 1],
+title = "Focal Strain Population Size over Time", 
+xlabel = "Time [hours]",
+ylabel = "Population Size",
+)
 
 CairoMakie.lines!(ax, results.PopSizeMetric.time, results.PopSizeMetric.pop1)
 
