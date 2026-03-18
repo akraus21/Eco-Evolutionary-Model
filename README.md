@@ -103,15 +103,15 @@ $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
 ## Example use
 
-_Activate the environment_
+    _Activate the environment_
     using Pkg
     Pkg.activate("../..")
     Pkg.instantiate()
 
-_Include all dependencies_
+    _Include all dependencies_
     include("Main Simulation.jl")
 
-_Define the model configuration_
+    _Define the model configuration_
     co_config = ModelConfig(
         growth_fn = growth_rate,
         death_fn = death_rate,
@@ -126,7 +126,7 @@ _Define the model configuration_
         params = const_params(K = 1e7)
     )
 
-_Run the simulation_
+    _Run the simulation_
     results = run_simulation(co_counts0, co_config)
 
 The results can afterwards be plotted 
