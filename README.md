@@ -103,14 +103,13 @@ $p^{\mathrm{surv}}_{\max} \approx 0.65$
 
 ## Example use
 
-`
-_Activate the environment_
-using Pkg
-Pkg.activate("../..")
-Pkg.instantiate()
-
-_Include all dependencies_
-include("Main Simulation.jl")
+> _Activate the environment_
+> using Pkg
+> Pkg.activate("../..")
+> Pkg.instantiate()
+>
+> _Include all dependencies_
+> include("Main Simulation.jl")
 
 _Define the model configuration_
 co_config = ModelConfig(
@@ -126,7 +125,6 @@ co_config = ModelConfig(
     metrics = [Every(PopSizeMetric(), 1.0)], 
     params = const_params(K = 1e7)
 )
-`
 
 _Run the simulation_
 results = run_simulation(co_counts0, co_config)
