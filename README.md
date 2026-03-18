@@ -25,7 +25,7 @@ Simulates two growing, dying, mutating and interacting species under the effect 
 
 The objective was to construct an informed model with as few parameters as possible, while retaining the qualitative characteristics of data from evolution experiments, specifically survival times of _E. coli_ in co-culture.
 
-Experimental populations can reach sizes of \($10^7$ - $10^8$\) cells, making fully explicit individual-based models (IBMs) computationally infeasible.  
+Experimental populations can reach sizes of $10^7$ - $10^8$ cells, making fully explicit individual-based models (IBMs) computationally infeasible.  
 
 To address this, I employ a **coarse-grained individual-based model**, where individuals are grouped into bins based on their resistance phenotype $R_{50}$. Each bin is updated collectively in discrete time steps, significantly reducing computational cost while retaining key evolutionary dynamics.
 
@@ -38,7 +38,7 @@ To address this, I employ a **coarse-grained individual-based model**, where ind
 
 ## Model Dynamics
 
-Let $\(N_{i,k}(t)\)$ denote the abundance of species $i$ in resistance bin $k$, with total population  
+Let $N_{i,k}(t)$ denote the abundance of species $i$ in resistance bin $k$, with total population  
 $N_i(t) = \sum_k N_{i,k}(t).$
 
 Each time step consists of four stochastic processes applied to every bin:
