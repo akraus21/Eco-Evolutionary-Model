@@ -136,7 +136,8 @@ ax = Axis(fig[1, 1])
 
 CairoMakie.lines!(ax, results.PopSizeMetric.time, results.PopSizeMetric.pop1)
 
-<img width="1200" height="900" alt="Example Plot" src="https://github.com/user-attachments/assets/1c4c0b5b-00bf-4f34-9fe7-aecbc5c18050" />
+<img width="1200" height="900" alt="Example Plot" src="https://github.com/user-attachments/assets/0c676928-5013-43dc-ac35-a90d374aa79d" />
+
 
 ## Why this project? 
 
