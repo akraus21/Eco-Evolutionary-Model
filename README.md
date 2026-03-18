@@ -1,6 +1,20 @@
-# Stochastic Eco-Evolutionary-Model
+# Stochastic Eco-Evolutionary-Model (Julia)
 
 ---
+
+## Key Features
+
+- Trait-based population model (binned resistance levels)
+- Stochastic birth, death, and mutation
+- Drug response via Hill function
+- Optional species interactions and pooling
+
+## Purpose
+
+This framework enables:
+- Efficient simulation of large co-culture populations  
+- Exploration of eco-evolutionary dynamics under drug pressure  
+- Comparison between simulation results and experimental survival data  
 
 ## Modeling Approach
 
@@ -84,25 +98,5 @@ For typical parameters:
 - Threshold ≈ 2× increase in $\(R_{50}\)$  
 - Maximum survival probability:
 $p^{\mathrm{surv}}_{\max} \approx 0.65$
-
----
-
-## Key Features
-
-- Written in Julia for high-perfomance and dispatch functionality
-- Coarse-grained stochastic IBM  
-- Log-normal mutation kernel (DFE)  
-- Density-dependent growth (crowding)  
-- Drug-response via Hill functions  
-- Explicit modeling of mutation establishment thresholds  
-
----
-
-## Purpose
-
-This framework enables:
-- Efficient simulation of large co-culture populations  
-- Exploration of eco-evolutionary dynamics under drug pressure  
-- Comparison between simulation results and experimental survival data  
 
 
